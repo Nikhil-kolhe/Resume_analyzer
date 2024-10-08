@@ -31,9 +31,6 @@ class ResumeParser:
     MAX_FILE_SIZE = 8 * 1024 * 1024  # 8 MB
     MAX_WORD_COUNT = 1000000  
     
-    def __init__(self):
-        pass
-    
     def check_file_size(self, file):
         return file.size <= self.MAX_FILE_SIZE
 
@@ -72,8 +69,13 @@ class ResumeParser:
                     text += page_text + "\n"
         
             if not text.strip():
-                st.error("No text detected, Please provide a file from which we can extract text.")
-                    
+                images = convert_from_bytes(file.read())
+            
+                for image in images:
+                    # Perform OCR on each image
+                    image_text = pytesseract.image_to_string(image)
+                    if image_text.strip():
+                        text += image_text + "\n"    
         except Exception as e:
             logging.error(f"Error extracting text from PDF: {str(e)}")
         
