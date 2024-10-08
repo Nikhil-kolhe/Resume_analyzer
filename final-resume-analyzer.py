@@ -70,10 +70,9 @@ class ResumeParser:
                     text += page_text + "\n"
         
             if not text.strip():
-                images = convert_from_bytes(file.read())
+                images = convert_from_path(file)
             
                 for image in images:
-                    # Perform OCR on each image
                     image_text = pytesseract.image_to_string(image)
                     if image_text.strip():
                         text += image_text + "\n"    
