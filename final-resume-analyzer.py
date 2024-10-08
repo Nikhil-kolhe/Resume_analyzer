@@ -2,7 +2,6 @@ import streamlit as st
 import PyPDF2
 import docx2txt
 import pytesseract
-from pdf2image import convert_from_path
 from PIL import Image
 import os
 import sklearn
@@ -70,16 +69,8 @@ class ResumeParser:
                     text += page_text + "\n"
         
             if not text.strip():
-                pages = convert_from_path(file, 300)  # 300 DPI
-            
-                text = ""
-                for i, page in enumerate(pages.read()):
-                    image_path = f"page_{i+1}.jpg"
-                    page.save(image_path, "JPEG")
-            
-                    text += extract_text_from_image(page)
-            
-                    os.remove(image_path)
+                st.error("No text detected, Please provide a file from which we can extract text.")
+
         except Exception as e:
             logging.error(f"Error extracting text from PDF: {str(e)}")
         
