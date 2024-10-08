@@ -1,0 +1,10 @@
+docx2txt
+streamlit
+PyPDF2
+python-docx
+pytesseract
+Pillow
+scikit-learn
+python-dotenv
+google-generativeai
+numpy
