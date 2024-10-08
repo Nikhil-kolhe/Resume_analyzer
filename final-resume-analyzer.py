@@ -102,7 +102,7 @@ class ResumeParser:
 
     def extract_text_from_image(self, file):
         try:
-            pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+            pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
             
             image = Image.open(file)
 
