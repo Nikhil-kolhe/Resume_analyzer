@@ -77,7 +77,7 @@ class ResumeParser:
                     image_path = f"page_{i+1}.jpg"
                     page.save(image_path, "JPEG")
             
-                    text += extract_text_from_image(image_path)
+                    text += extract_text_from_image(page)
             
                     os.remove(image_path)
         except Exception as e:
