@@ -8,3 +8,4 @@ scikit-learn
 python-dotenv
 google-generativeai
 numpy
+pdf2image
