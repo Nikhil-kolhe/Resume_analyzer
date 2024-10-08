@@ -1,9 +1,0 @@
-streamlit
-PyPDF2
-pytesseract
-Pillow
-google-generativeai
-numpy
-sklearn
-python-dotenv
-docx2txt
