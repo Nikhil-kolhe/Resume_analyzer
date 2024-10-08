@@ -12,63 +12,57 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
 
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load environment variables
 load_dotenv()
 
-# Get API key from environment variable
 api_key = os.getenv("GEMINI_API_KEY")
 
-# Check if API key is available
 if not api_key:
     logger.error("Gemini API key not found in environment variables.")
     st.error("Gemini API key not found. Please set the GEMINI_API_KEY environment variable.")
 else:
     genai.configure(api_key=api_key)
 
-# Set page config
 st.set_page_config(page_title='Resume Analyzer AI', layout="wide")
 
 class ResumeParser:
     MAX_FILE_SIZE = 8 * 1024 * 1024  # 8 MB
     MAX_WORD_COUNT = 1000000  
     
-    @staticmethod
-    def check_file_size(file):
-        return file.size <= ResumeParser.MAX_FILE_SIZE
+    def __init__(self):
+        pass
+    
+    def check_file_size(self, file):
+        return file.size <= self.MAX_FILE_SIZE
 
-    @staticmethod
-    def check_word_count(text):
-        return len(text.split()) <= ResumeParser.MAX_WORD_COUNT
+    def check_word_count(self, text):
+        return len(text.split()) <= self.MAX_WORD_COUNT
 
-    @staticmethod
-    def parse_resume(file):
-        if not ResumeParser.check_file_size(file):
+    def parse_resume(self, file):
+        if not self.check_file_size(file):
             raise ValueError(f"File size exceeds the maximum limit of 8 MB. Your file size: {file.size / (1024 * 1024):.2f} MB")
 
         file_extension = file.name.split('.')[-1].lower()
         
         if file_extension == 'pdf':
-            text = ResumeParser.extract_text_from_pdf(file)
+            text = self.extract_text_from_pdf(file)
         elif file_extension in ['doc', 'docx']:
-            text = ResumeParser.extract_text_from_doc(file)
+            text = self.extract_text_from_doc(file)
         elif file_extension in ['txt', 'text']:
             text = file.getvalue().decode('utf-8')
         elif file_extension in ['png', 'jpg', 'jpeg']:
-            text = ResumeParser.extract_text_from_image(file)
+            text = self.extract_text_from_image(file)
         else:
             raise ValueError("Unsupported file format")
         
-        if not ResumeParser.check_word_count(text):
+        if not self.check_word_count(text):
             raise ValueError(f"Word count exceeds the maximum limit of 1 million words. Your word count: {len(text.split())}")
         
         return text
 
-    @staticmethod
-    def extract_text_from_pdf(file):
+    def extract_text_from_pdf(self, file):
         text = ""
         try:
             pdf_reader = PyPDF2.PdfReader(file)
@@ -79,17 +73,15 @@ class ResumeParser:
         
             if not text.strip():
                 st.error("No text detected, Please provide a file from which we can extract text.")
-                
                     
         except Exception as e:
             logging.error(f"Error extracting text from PDF: {str(e)}")
         
         return text
 
-    @staticmethod
-    def extract_text_from_doc(file):
+    def extract_text_from_doc(self, file):
         text = docx2txt.process(file)
-        # Extract text from images in the document
+
         temp_dir = tempfile.mkdtemp()
         try:
             temp_file = os.path.join(temp_dir, "temp_doc")
@@ -99,25 +91,22 @@ class ResumeParser:
             for image_file in os.listdir(temp_dir):
                 if image_file.endswith(('.png', '.jpg', '.jpeg')):
                     image_path = os.path.join(temp_dir, image_file)
-                    image_text = ResumeParser.extract_text_from_image(image_path)
-                    if image_text.strip():  # Only add non-empty text
+                    image_text = self.extract_text_from_image(image_path)
+                    if image_text.strip():  
                         text += "\n" + image_text
         finally:
-            # Clean up temporary files
             for file in os.listdir(temp_dir):
                 os.remove(os.path.join(temp_dir, file))
             os.rmdir(temp_dir)
         return text
 
-    @staticmethod
-    def extract_text_from_image(file):
+    def extract_text_from_image(self, file):
         try:
             pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
             
             image = Image.open(file)
 
-            # Preprocessing steps
-            image = image.convert('L')  # Convert to grayscale
+            image = image.convert('L')  
             image = image.point(lambda x: 0 if x < 128 else 255, '1')  # Binarize the image
   
             text = pytesseract.image_to_string(image, lang='eng')
@@ -253,13 +242,11 @@ def load_css():
     with open("style.css", "r") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-
 def main():
     load_css()
     
     st.markdown("<h1 class='main-title'>AI-Powered Resume Analyzer</h1>", unsafe_allow_html=True)
 
-    # Initialize session state variables if they don't exist
     if 'resume_analyzer' not in st.session_state:
         st.session_state['resume_analyzer'] = None
     if 'analysis_result' not in st.session_state:
@@ -271,9 +258,8 @@ def main():
 
     with col2:
         st.markdown("<h3 class='section-title'>Upload Your Resume</h3>", unsafe_allow_html=True)
-        uploaded_file = st.file_uploader(label='Analyze Your Resume With Gemini', type=['pdf', 'docx', 'doc', 'txt'])
+        uploaded_file = st.file_uploader(label='Analyze Your Resume', type=['pdf', 'docx', 'doc', 'txt'])
         
-        # Clear previous analysis when no file is uploaded
         if uploaded_file is None:
             st.session_state['resume_analyzer'] = None
             st.session_state['analysis_result'] = None
@@ -281,12 +267,13 @@ def main():
         else:
             try:
                 with st.spinner('Processing your resume...'):
-                    resume_text = ResumeParser.parse_resume(uploaded_file)
+                    resume_parser = ResumeParser()
+                    resume_text = resume_parser.parse_resume(uploaded_file)
                     st.session_state['resume_analyzer'] = ResumeAnalyzer(resume_text)
                 st.success("Resume uploaded successfully!")
             except Exception as e:
                 st.error(str(e))
-
+    
     if st.session_state['resume_analyzer']:
         st.markdown("<h3 class='section-title'>Analysis Options</h3>", unsafe_allow_html=True)
         
@@ -333,6 +320,29 @@ def main():
             result_title, result_content = st.session_state['analysis_result']
             st.markdown(f"<h2 class='section-title'>{result_title}</h2>", unsafe_allow_html=True)
             st.markdown(f"<div class='content-box'><div class='analysis-result'>{result_content}</div></div>", unsafe_allow_html=True)
+
+            if result_title == "Resume Analysis":
+                cleaned_content = result_content.replace("**", "").replace(" ", "")
+                st.download_button(
+                label="Download Summary",
+                data=result_content,
+                file_name="resume_analysis.txt",
+                mime="text/plain"
+            )
+            elif result_title == "Suggested Job Titles":
+                st.download_button(
+                label="Download Suggested Job Titles",
+                data=result_content,
+                file_name="suggested_job_titles.txt",
+                mime="text/plain"
+            )
+            elif result_title == "Job Alignment Analysis":
+                st.download_button(
+                label="Download Job Alignment Analysis",
+                data=result_content,
+                file_name="job_alignment_analysis.txt",
+                mime="text/plain"
+        )
 
 if __name__ == "__main__":
     main()
