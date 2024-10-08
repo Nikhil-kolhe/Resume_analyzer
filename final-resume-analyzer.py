@@ -2,6 +2,7 @@ import streamlit as st
 import PyPDF2
 import docx2txt
 import pytesseract
+from pdf2image import convert_from_bytes
 from PIL import Image
 import os
 import sklearn
