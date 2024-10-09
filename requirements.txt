@@ -8,4 +8,3 @@ scikit-learn
 python-dotenv
 google-generativeai
 numpy
-fitz
