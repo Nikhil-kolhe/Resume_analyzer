@@ -24,7 +24,7 @@ st.set_page_config(page_title='Resume Analyzer AI', layout="wide")
 
 class ResumeParser:
     MAX_FILE_SIZE = 6 * 1024 * 1024 
-    MAX_WORD_COUNT = 1000000  
+    MAX_WORD_COUNT = 300000  
     
     def check_file_size(self, file):
         return file.size <= self.MAX_FILE_SIZE
@@ -50,7 +50,7 @@ class ResumeParser:
             raise ValueError("Unsupported file format")
         
         if not self.check_word_count(text):
-            raise ValueError(f"Word count exceeds the maximum limit of 1 million words. Your word count: {len(text.split())}")
+            raise ValueError(f"Word count exceeds the maximum limit of words. Your word count: {len(text.split())}")
         
         return text
 
