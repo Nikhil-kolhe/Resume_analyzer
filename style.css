@@ -83,14 +83,6 @@ body {
     font-weight: bold;
 }
 
-/* Sidebar styling */
-.css-1d391kg {
-    background-color: rgba(44, 62, 80, 0.9);
-}
-
-.css-1d391kg .stRadio > label {
-    color: white;
-}
 
 @media (max-width: 768px) {
     .main-title {
