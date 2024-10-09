@@ -10,6 +10,7 @@ import google.generativeai as genai
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
+import fitz
 
 load_dotenv()
 
@@ -64,10 +65,19 @@ class ResumeParser:
                     text += page_text + "\n"
         
             if not text.strip():
-                st.error("No text detected, Please provide a file from which we can extract text.")
+                with fitz.open(file) as pdf:
+                    for page_number in range(len(pdf)):
+                        page = pdf[page_number]
+                        pix = page.get_pixmap()
+            
+                        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            
+                        page_text = ResumeParser.extract_text_from_image(img)
+            
+                        text += f"Page {page_number + 1}:\n{page_text}\n\n"
 
         except Exception as e:
-            pass
+            print(e)
         
         return text
 
@@ -105,6 +115,7 @@ class ResumeParser:
             
             return text
         except Exception as e:
+            print(e)
             return ""
 
 class ResumeAnalyzer:
