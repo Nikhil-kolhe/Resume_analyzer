@@ -108,9 +108,6 @@ class ResumeParser:
             return ""
 
 class ResumeAnalyzer:
-    MAX_OUTPUT_WORDS = 7500
-    MAX_OUTPUT_SIZE = 32.8 * 1024  # 32.8 KB
-
     def __init__(self, resume_text):
         self.resume_text = resume_text
         self.model = genai.GenerativeModel('gemini-1.5-pro')
@@ -118,22 +115,10 @@ class ResumeAnalyzer:
     def generate_chunks(self, text, chunk_size=500):
         return [text[i:i + chunk_size] for i in range(0, len(text), chunk_size)]
 
-    def truncate_output(self, text):
-        words = text.split()
-        if len(words) > self.MAX_OUTPUT_WORDS:
-            truncated_text = ' '.join(words[:self.MAX_OUTPUT_WORDS])
-        else:
-            truncated_text = text
-
-        if len(truncated_text.encode('utf-8')) > self.MAX_OUTPUT_SIZE:
-            truncated_text = truncated_text.encode('utf-8')[:self.MAX_OUTPUT_SIZE].decode('utf-8', 'ignore')
-
-        return truncated_text
-
     def gemini_query(self, prompt):
         try:
             response = self.model.generate_content(prompt)
-            return self.truncate_output(response.text)
+            return response.text
         except Exception as e:
             raise ValueError(f"An error occurred while processing your request: {str(e)}")
 
@@ -224,7 +209,7 @@ class ResumeAnalyzer:
             return analysis
 
         except Exception as e:
-            return self.truncate_output(f"An error occurred during job alignment analysis: {str(e)}")
+            return f"An error occurred during job alignment analysis: {str(e)}"
 
 def load_css():
     with open("style.css", "r") as f:
