@@ -34,7 +34,7 @@ class ResumeParser:
 
     def parse_resume(self, file):
         if not self.check_file_size(file):
-            raise ValueError(f"File size exceeds the maximum limit of 8 MB. Your file size: {file.size / (1024 * 1024):.2f} MB")
+            raise ValueError(f"File size exceeds the maximum limit of 6MB. Your file size: {file.size / (1024 * 1024):.2f} MB")
 
         file_extension = file.name.split('.')[-1].lower()
         
