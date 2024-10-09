@@ -23,7 +23,7 @@ else:
 st.set_page_config(page_title='Resume Analyzer AI', layout="wide")
 
 class ResumeParser:
-    MAX_FILE_SIZE = 8 * 1024 * 1024  # 8 MB
+    MAX_FILE_SIZE = 6 * 1024 * 1024 
     MAX_WORD_COUNT = 1000000  
     
     def check_file_size(self, file):
