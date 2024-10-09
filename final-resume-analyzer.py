@@ -113,9 +113,6 @@ class ResumeAnalyzer:
         self.resume_text = resume_text
         self.model = genai.GenerativeModel('gemini-1.5-pro')
 
-    def generate_chunks(self, text, chunk_size=500):
-        return [text[i:i + chunk_size] for i in range(0, len(text), chunk_size)]
-
     def gemini_query(self, prompt):
         try:
             response = self.model.generate_content(prompt)
@@ -141,7 +138,6 @@ class ResumeAnalyzer:
         return similarity
 
     def get_summary(self):
-        chunks = self.generate_chunks(self.resume_text)
         prompt = f'''Act as a Human Resource Manager having all technical and non-technical knowledge in the fields of Engineering 
                     like artificial intelligence, data science, computer science, information technology, cyber security, civil engineering, mechanical engineering, etc.
                     Analyze the text extracted from resume. Which are given in chunks and divide it into standard resume Analyze the following resume sections such as:
@@ -160,7 +156,7 @@ class ResumeAnalyzer:
                     
                     
                     """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-                    {" ".join(chunks)}
+                    {self.resume_text}
                     """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
                     '''
         return self.gemini_query(prompt)
@@ -182,9 +178,6 @@ class ResumeAnalyzer:
         
             similarity_score = self.calculate_similarity(resume_embedding, job_description_embedding)
 
-            resume_chunks = self.generate_chunks(self.resume_text)
-            job_chunks = self.generate_chunks(job_description)
-
             prompt = f'''Firstly check if given file is not resume ask user to provide standard resume also give suggestion about standard resume.
                         if given file is resume then act as a best Application tracking system (ATS) and Analyze the given resume and the job description to determine how well the resume fits the job requirements.
                         The similarity score between the resume and job description is {similarity_score * 100:.2f}%.
@@ -197,12 +190,12 @@ class ResumeAnalyzer:
 
                         Resume:
                         """
-                        {" ".join(resume_chunks)}
+                        {self.resume_text}
                         """
 
                         Job Description:
                         """
-                        {" ".join(job_chunks)}
+                        {job_description}
                         """
                         '''
 
