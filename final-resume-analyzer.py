@@ -275,9 +275,9 @@ def main():
             st.session_state['job_description'] = st.text_area("Enter the job description", 
                                                                value=st.session_state['job_description'], 
                                                                height=100)
-            if st.button("Analyze Job Alignment"):
+            if st.button("Analyze Job Fit"):
                 if st.session_state['job_description']:
-                    with st.spinner('Analyzing job alignment...'):
+                    with st.spinner('Analyzing job fit...'):
                         try:
                             alignment_analysis = st.session_state['resume_analyzer'].get_job_alignment(st.session_state['job_description'])
                             st.session_state['analysis_result'] = ("Job Alignment Analysis", alignment_analysis)
