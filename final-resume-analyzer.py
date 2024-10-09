@@ -79,7 +79,7 @@ class ResumeParser:
             temp_file = os.path.join(temp_dir, "temp_doc")
             with open(temp_file, "wb") as f:
                 f.write(file.getvalue())
-            doc = docx2txt.process(temp_file, temp_dir)
+            # doc = docx2txt.process(temp_file, temp_dir)
             for image_file in os.listdir(temp_dir):
                 if image_file.endswith(('.png', '.jpg', '.jpeg')):
                     image_path = os.path.join(temp_dir, image_file)
