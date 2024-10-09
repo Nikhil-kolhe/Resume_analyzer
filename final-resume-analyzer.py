@@ -178,7 +178,7 @@ class ResumeAnalyzer:
         
             similarity_score = self.calculate_similarity(resume_embedding, job_description_embedding)
 
-            prompt = f'''Firstly check if given file is not resume ask user to provide standard resume also give suggestion about standard resume.
+            prompt = f'''Firstly check if given file is not resume ask user to provide standard resume also give suggestion about standard resume and same for job description.
                         if given file is resume then act as a best Application tracking system (ATS) and Analyze the given resume and the job description to determine how well the resume fits the job requirements.
                         The similarity score between the resume and job description is {similarity_score * 100:.2f}%.
                         (dont show to UI about semantic similarity only give your analysis of matching resume with job description also check words from resume and Job description)
