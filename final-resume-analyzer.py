@@ -6,21 +6,16 @@ from PIL import Image
 import os
 import sklearn
 import tempfile
-import logging
 import google.generativeai as genai
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 load_dotenv()
 
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
-    logger.error("Gemini API key not found in environment variables.")
     st.error("Gemini API key not found. Please set the GEMINI_API_KEY environment variable.")
 else:
     genai.configure(api_key=api_key)
@@ -72,7 +67,7 @@ class ResumeParser:
                 st.error("No text detected, Please provide a file from which we can extract text.")
 
         except Exception as e:
-            logging.error(f"Error extracting text from PDF: {str(e)}")
+            pass
         
         return text
 
@@ -104,13 +99,12 @@ class ResumeParser:
             image = Image.open(file)
 
             image = image.convert('L')  
-            image = image.point(lambda x: 0 if x < 128 else 255, '1')  # Binarize the image
+            image = image.point(lambda x: 0 if x < 128 else 255, '1') 
   
             text = pytesseract.image_to_string(image, lang='eng')
             
             return text
         except Exception as e:
-            logging.error(f"Error extracting text from image: {str(e)}")
             return ""
 
 class ResumeAnalyzer:
@@ -141,7 +135,6 @@ class ResumeAnalyzer:
             response = self.model.generate_content(prompt)
             return self.truncate_output(response.text)
         except Exception as e:
-            logger.error(f"Error in Gemini query: {str(e)}")
             raise ValueError(f"An error occurred while processing your request: {str(e)}")
 
     def get_embedding(self, text):
@@ -153,7 +146,6 @@ class ResumeAnalyzer:
             )
             return np.array(embedding['embedding'])
         except Exception as e:
-            logger.error(f"Error in getting embedding: {str(e)}")
             raise ValueError(f"An error occurred while getting embedding: {str(e)}")
 
     def calculate_similarity(self, resume_embedding, job_description_embedding):
@@ -232,7 +224,6 @@ class ResumeAnalyzer:
             return analysis
 
         except Exception as e:
-            logger.error(f"Error in job alignment analysis: {str(e)}")
             return self.truncate_output(f"An error occurred during job alignment analysis: {str(e)}")
 
 def load_css():
@@ -284,7 +275,6 @@ def main():
                         st.session_state['analysis_result'] = ("Resume Analysis", summary)
                     except Exception as e:
                         st.error(f"An error occurred during resume analysis: {str(e)}")
-                        logging.error(f"Resume analysis error: {str(e)}", exc_info=True)
 
         with col2:
             if st.button("Get Suggested Job Titles"):
@@ -294,7 +284,6 @@ def main():
                         st.session_state['analysis_result'] = ("Suggested Job Titles", job_titles)
                     except Exception as e:
                         st.error(f"An error occurred while suggesting job titles: {str(e)}")
-                        logging.error(f"Job title suggestion error: {str(e)}", exc_info=True)
 
         with col3:
             st.session_state['job_description'] = st.text_area("Enter the job description", 
@@ -308,7 +297,6 @@ def main():
                             st.session_state['analysis_result'] = ("Job Alignment Analysis", alignment_analysis)
                         except Exception as e:
                             st.error(f"An error occurred during job alignment analysis: {str(e)}")
-                            logging.error(f"Job alignment analysis error: {str(e)}", exc_info=True)
                 else:
                     st.warning("Please enter a job description to analyze alignment.")
 
@@ -319,10 +307,10 @@ def main():
             st.markdown(f"<div class='content-box'><div class='analysis-result'>{result_content}</div></div>", unsafe_allow_html=True)
 
             if result_title == "Resume Analysis":
-                cleaned_content = result_content.replace("**", "").replace(" ", "")
+                cleaned_content = result_content.replace("*", "").replace(" ", "")
                 st.download_button(
                 label="Download Summary",
-                data=result_content,
+                data=cleaned_content,
                 file_name="resume_analysis.txt",
                 mime="text/plain"
             )
