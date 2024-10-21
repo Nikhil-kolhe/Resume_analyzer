@@ -36,7 +36,7 @@ A web-based application that analyzes resumes and suggests improvements using AI
 
 ## File Upload
 - Supports PDF, DOCX, DOC, TXT.
-- Max file size: 8MB.
+- Max file size: 6MB.
 
 ## Screenshots
 
